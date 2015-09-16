@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Shooter game</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="482" height="482"></canvas>
+    <div id="joystick" style="height:482px;width:482px;background:#ccc;float:right">
+
+    </div>
+    <style media="screen">
+      .absolute {
+        width: 50px;
+        height: 50px;
+        background: #333;
+        position: absolute;
+      }
+      body, html {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        position: relative;
+      }
+      #canvas {
+        border:1px solid #333;
+      }
+    </style>
+  </body>
+  <script type="text/javascript" src="virtualjoystick.js"></script>
+  <script type="text/javascript">
+
+  var joystick = new VirtualJoystick({
+    container: document.getElementById("joystick"),
+    mouseSupport:true
+  })
+
+
+      var canvas = document.getElementById("canvas");
+      var context = canvas.getContext("2d");
+      var keydown = {up: false, down: false, left: false, right: false}
+      var WIDTH = canvas.width;
+      var HEIGHT = canvas.height;
+      var img = new Image();
+      var collision = 0;
+      var allBullets = [];
+
+      var mouseX = 0, mouseY = 0;
+
+      function Ball(ctx,x,y,r) {
+        this.x = x;
+        this.y = y;
+        this.r = r;
+        this.draw = function(){
+          ctx.save();
+          this.x += joystick.deltaX()/20;
+          this.y += joystick.deltaY()/20;
+          ctx.translate(this.x,this.y);
+          ctx.rotate(Math.atan2(joystick.deltaY(), joystick.deltaX()));
+          ctx.translate(-this.x,-this.y);
+          ctx.beginPath();
+          ctx.arc(this.x,this.y,this.r,0,2*Math.PI);
+          ctx.stroke();
+          ctx.moveTo(this.x,this.y);
+          ctx.lineTo(this.x+this.r,this.y);
+          ctx.stroke();
+          ctx.closePath();
+          ctx.restore();
+        }
+      }
+
+      function Bullet(ctx,x,y) {
+        this.x = x;
+        this.y = y;
+        var angle = Math.atan2(joystick.deltaY(), joystick.deltaX())
+        this.move = function(){
+          ctx.beginPath();
+          ctx.arc(this.x,this.y,2,0,2*Math.PI);
+          ctx.fill();
+          ctx.closePath();
+
+          this.x += Math.cos(angle) * 10;
+          this.y += Math.sin(angle) * 10;
+        }
+      }
+
+      var myBall = new Ball(context,100,100,10);
+
+      function draw() {
+        requestAnimationFrame(draw);
+        // draw code
+        context.clearRect(0,0,500,500);
+        console.log(getVelocity())
+        myBall.draw();
+        for (i = 0; i < allBullets.length; i++) {
+          allBullets[i].move();
+        }
+      }
+
+      draw();
+
+      function getVelocity(){
+        return Math.sqrt( ( joystick.deltaX() * joystick.deltaX() ) + ( joystick.deltaY() * joystick.deltaY() ) )
+      }
+
+      function onKeyAction(e) {
+            switch (e.keyCode) {
+                case 37:
+                    keydown.left = (e.type === "keydown");
+                    break;
+                case 38:
+                    keydown.up = (e.type === "keydown");
+                    break;
+                case 39:
+                    keydown.right = (e.type === "keydown");
+                    break;
+                case 40:
+                    keydown.down = (e.type === "keydown");
+                    break;
+                case 32:
+                    if (e.type === "keydown") {
+                      var newBullet = new Bullet(context,myBall.x, myBall.y,180);
+                      allBullets.push(newBullet);
+                    }
+                    break;
+            }
+        }
+      document.addEventListener("keydown", onKeyAction);
+      document.addEventListener("keyup", onKeyAction);
+  </script>
+</html>
