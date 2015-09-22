@@ -1,0 +1,19 @@
+{
+  "name": "shooter-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "virtualjoystick.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ScholtenSeb/shooter-game.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ScholtenSeb/shooter-game/issues"
+  },
+  "homepage": "https://github.com/ScholtenSeb/shooter-game#readme"
+}
